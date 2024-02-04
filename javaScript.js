@@ -413,23 +413,6 @@ function calculateAltVU(IU, randomIndices, n) {
 function calculateEnd() {
   let outputContainer = document.getElementById("calculateEndContainer"); // Використовуємо вже існуючий контейнер
 
-  for (let matrix in priorityVectors) {
-    let priorityVector = priorityVectors[matrix]; // Вектор пріоритетів для поточної матриці
-
-    for (let i = 0; i < priorityVector.length; i++) {
-      let p = document.createElement('p');
-      p.textContent = matrix + " вектор пріорітету для альтернативи " + (i + 1) + " = " + priorityVector[i].toFixed(8).replace(/\.?0+$/, "");
-      outputContainer.appendChild(p); // Додайте текст до контейнера для виводу
-    }
-  }
-
-  // Виведення вектора пріорітету для критеріїв
-  for (let criteria in priorityVectorsForCriterias) {
-    let p = document.createElement('p');
-    p.textContent = criteria + " = " + priorityVectorsForCriterias[criteria].toFixed(8).replace(/\.?0+$/, "");
-    outputContainer.appendChild(p); // Додайте текст до контейнера для виводу
-  }
-
   let altNames = getAltNames(); // Отримуємо назви альтернатив
 
   // Перевіряємо, чи getAltNames() повертає правильну кількість назв
@@ -442,6 +425,8 @@ function calculateEnd() {
   let numAlts = priorityVectors['matrix1'].length; // Кількість альтернатив
   let bestAltName = altNames[0];
   let bestAltValue = 0;
+  let allValuesEqual = true;
+  let previousSum = null;
   for (let i = 0; i < numAlts; i++) {
     let sum = 0;
     for (let matrix in priorityVectors) {
@@ -458,12 +443,24 @@ function calculateEnd() {
       bestAltValue = sum;
       bestAltName = altNames[i];
     }
+
+    // Перевірка, чи всі значення рівні
+    if (previousSum !== null && sum !== previousSum) {
+      allValuesEqual = false;
+    }
+    previousSum = sum;
   }
 
+  // Виведення кращої альтернативи або повідомлення про рівність значень
   let p = document.createElement('p');
-p.innerHTML = "<strong>Краща альтернатива: " + bestAltName + " зі значенням " + bestAltValue.toFixed(8).replace(/\.?0+$/, "") + "</strong>";
-outputContainer.appendChild(p); // Додайте текст до контейнера для виводу
+  if (allValuesEqual) {
+    p.textContent = "Всі значення рівні.";
+  } else {
+    p.innerHTML = "<strong>Краща альтернатива: " + bestAltName + " зі значенням " + bestAltValue.toFixed(8).replace(/\.?0+$/, "") + "</strong>";
+  }
+  outputContainer.appendChild(p); // Додайте текст до контейнера для виводу
 }
+
 
 
 function getAltNames() {
